@@ -1,2 +1,3 @@
-# yii2-widget-ipinfo
-An IP address information display widget with country flag and geo position info.
+# yii2-ipinfo
+
+An IP address information display widget for Yii framework 2.0 with ability to display country flag and geo position info.
