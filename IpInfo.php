@@ -143,7 +143,7 @@ class IpInfo extends Widget
      * `tag`: string, the `tag` in which the content will be rendered.
      *  Defaults to `span`.
      */
-    public $options = [];
+    public $options = ['class' => 'text-center'];
 
     /**
      * @var array the default field keys and labels setting (@see `initOptions` method)
@@ -197,7 +197,7 @@ class IpInfo extends Widget
         try {
             $json = file_get_contents(self::API_INFO . $params);
         } catch (\Exception $e) {
-            return empty($this->errorData) ? '' : self::renderTag($this->errorData, $this->errorDataOptions);
+            return empty($this->errorData) ? '' : static::renderTag($this->errorData, $this->errorDataOptions);
         }
         if ($this->showJson) {
             return $json;
@@ -206,7 +206,7 @@ class IpInfo extends Widget
         $noData = empty($this->noData) ? Yii::t('kvip', 'No data found for IP address {ip}.', [
             'ip' => '<pre style="margin:5px 0 0 0">' . $this->ip . '</pre>'
         ]) : $this->noData;
-        $noData = self::renderTag($noData, $this->noDataOptions, 'div');
+        $noData = static::renderTag($noData, $this->noDataOptions, 'div');
         $credits = '';
         if ($this->showCredits) {
             $label = ArrayHelper::remove($this->creditsOptions, 'label', Yii::t('kvip', 'Revalidate IP info'));
@@ -230,7 +230,7 @@ class IpInfo extends Widget
                 $content .= "</table>\n{$credits}";
             }
         }
-        $content = self::renderTag($content, $this->options);
+        $content = static::renderTag($content, $this->options);
         if ($this->showFlag) {
             if (!isset($this->flagOptions['alt']) && !empty($ip)) {
                 $this->flagOptions['alt'] = $ip;
