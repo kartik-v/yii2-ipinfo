@@ -22,6 +22,7 @@ return [
     'Country Name' => '',
     'IP Address' => '',
     'IP Position Details' => '',
+    'IP fetch error' => '',
     'Latitude' => '',
     'Longitude' => '',
     'No data found for IP address {ip}.' => '',
