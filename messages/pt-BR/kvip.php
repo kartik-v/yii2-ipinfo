@@ -30,7 +30,3 @@ return [
     'No data found for IP address {ip}.' => 'Nenhum informação encontrada para o endereço IP {ip}.',
     'Revalidate IP info' => 'Revalidar informações do IP',
 ];
-
-
-
- 
