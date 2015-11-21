@@ -61,7 +61,6 @@ echo IpInfo::widget([
     // 'showFlag' => true,
     // 'showPosition' => true,
     // 'showPopover' => true,
-    // 'showJson' => false,
     // 'showCredits' => true,
     // 'popoverOptions' => [],
     // 'flagOptions' => []

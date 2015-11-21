@@ -1,0 +1,18 @@
+/*!
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014 - 2015
+ * @version 1.0.0
+ *
+ * CSS Styling for Krajee IP Information fetcher for `kartik-v/yii2-ipinfo` extension. 
+ *
+ * Author: Kartik Visweswaran
+ * Copyright: 2015, Kartik Visweswaran, Krajee.com
+ * For more JQuery plugins visit http://plugins.krajee.com
+ * For more Yii related demos visit http://demos.krajee.com
+ */
+.kv-ip-loading {
+    opacity: 0.8;
+    background: #ffffff url('../img/loading.gif') bottom 5px center no-repeat;
+    padding: 5px 5px 20px 5px;
+    text-align: center;
+    font-size: 12px;
+}

@@ -17,14 +17,17 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'City' => 'Cidade',
-    'Country Code' => 'Código do País',
-    'Country Name' => 'Nome do País',
-    'IP Address' => 'Endereço de IP',
-    'IP Position Details' => 'Detalhes do posicionamento IP',
-    'IP fetch error' => 'IP buscar erro',
-    'Latitude' => 'Latitude',
-    'Longitude' => 'Longitude',
-    'No data found for IP address {ip}.' => 'Não foram encontrados dados para o endereço IP {ip}.',
-    'Revalidate IP info' => 'Revalidar informações IP',
+    'City' => '',
+    'Country Code' => '',
+    'Country Name' => '',
+    'Fetching location info...' => '',
+    'IP Address' => '',
+    'IP Position Details' => '',
+    'IP fetch error' => '',
+    'Latitude' => '',
+    'Longitude' => '',
+    'No Flag' => '',
+    'No data found for IP address {ip}.' => '',
+    'No data found for the user\'s IP address.' => '',
+    'Revalidate IP info' => '',
 ];
