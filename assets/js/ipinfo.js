@@ -59,8 +59,7 @@
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    $el.html(self.errorData + '\n' + self.credits);
-                    $el.trigger('error.kvipinfo', [jqXHR, textStatus, errorThrown]);
+                    $el.trigger('error.kvipinfo', [jqXHR, textStatus, errorThrown]).html(self.errorData + '\n' + self.credits);
                 }
             });
         }

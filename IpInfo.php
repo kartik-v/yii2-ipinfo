@@ -214,7 +214,6 @@ class IpInfo extends Widget
      *
      * @param array $params
      */
-
     protected function registerAssets($params = [])
     {
         if (empty($this->noData)) {
