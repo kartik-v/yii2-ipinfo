@@ -34,7 +34,7 @@
                 dataType: 'json',
                 data: self.params,
                 beforeSend: function (jqXHR) {
-                    $el.trigger('beforesend.kvipinfo', [jqXHR]).html(self.loadingData);
+                    $el.trigger('beforesend.kvipinfo', [jqXHR]);
                 },
                 success: function (data, textStatus, jqXHR) {
                     var out = data, $table, $div, content = '';
@@ -89,8 +89,7 @@
         credits: '',
         contentOptions: {},
         noData: '',
-        errorData: '',
-        loadingData: ''
+        errorData: ''
     };
 
     $.fn.kvIpInfo.Constructor = KvIpInfo;

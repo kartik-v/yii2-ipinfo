@@ -183,7 +183,8 @@ class IpInfo extends Widget
         if ($this->showPosition) {
             $params['position'] = true;
         }
-        $content = self::renderTag('', $this->options);
+        $loadData = ArrayHelper::remove($this->loadingOptions, 'message', Yii::t('kvip', 'Fetching location info...'));
+        $content = self::renderTag(self::renderTag($loadData, $this->loadingOptions, 'div'), $this->options);
         if ($this->showFlag) {
             if (!isset($this->flagOptions['alt'])) {
                 $this->flagOptions['alt'] = empty($ip) ? Yii::t('kvip', 'No Flag') : $ip;
@@ -227,7 +228,6 @@ class IpInfo extends Widget
             $label = ArrayHelper::remove($this->creditsOptions, 'label', Yii::t('kvip', 'Revalidate IP info'));
             $credits = Html::a($label, self::API_HOME, $this->creditsOptions);
         }
-        $loadData = ArrayHelper::remove($this->loadingOptions, 'message', Yii::t('kvip', 'Fetching location info...'));
         $this->pluginOptions = [
             'fields' => empty($this->fields) ? array_keys($this->_defaultFields) : $this->fields,
             'defaultFields' => $this->_defaultFields,
@@ -236,8 +236,7 @@ class IpInfo extends Widget
             'credits' => $credits,
             'contentOptions' => $this->contentOptions,
             'noData' => self::renderTag($noData, $this->noDataOptions, 'div'),
-            'errorData' => empty($this->errorData) ? '' : self::renderTag($this->errorData, $this->errorDataOptions),
-            'loadingData' => self::renderTag($loadData, $this->loadingOptions, 'div'),
+            'errorData' => empty($this->errorData) ? '' : self::renderTag($this->errorData, $this->errorDataOptions)
         ];
         $view = $this->getView();
         $this->registerPlugin('kvIpInfo');
