@@ -1,5 +1,5 @@
 /*!
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014 - 2015
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2016
  * @version 1.0.0
  *
  * CSS Styling for Krajee IP Information fetcher for `kartik-v/yii2-ipinfo` extension. 
@@ -15,4 +15,47 @@
     padding: 5px 5px 20px 5px;
     text-align: center;
     font-size: 12px;
+}
+
+.kv-flag-center {
+    display: block;
+    margin: 5px auto;
+    text-align: center;
+}
+
+.kv-flag-center .flag-icon {
+    display: block;
+    margin:auto;
+    width:98%;
+    height:98%;
+}
+
+.kv-flag-wrapper {
+    width:100%;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.kv-flag-wrapper:after {
+    padding-top: 75%;
+    display: block;
+    content: '';
+}
+
+.kv-flag-wrapper .flag {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+}
+
+.kv-flag-bordered {
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }

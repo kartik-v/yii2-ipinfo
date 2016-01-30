@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2016
  * @package   yii2-ipinfo
  * @version   1.0.0
  */
@@ -12,22 +12,24 @@ use Yii;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use kartik\base\Widget;
+use kartik\icons\Icon;
 use kartik\popover\PopoverX;
 
 /**
  * IP Info widget for Yii2 with ability to display country flag and
- * geo position info. Uses the API from hostip.info to parse IP info.
+ * geo position info. Uses the API from freegeoip.net to parse IP info.
  *
- * @see http://hostip.info
+ * @see http://freegeoip.net
  *
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @since 1.0
  */
 class IpInfo extends Widget
 {
-    const API_HOME = 'http://www.hostip.info/';
-    const API_INFO = 'http://api.hostip.info/get_json.php';
-    const API_FLAG = 'http://api.hostip.info/flag.php';
+    /**
+     * @var string the api to fetch IP information
+     */
+    public $api = 'http://freegeoip.net/json/';
 
     /**
      * @var string the ip address
@@ -49,11 +51,6 @@ class IpInfo extends Widget
      * If set to false, the results will be rendered inline.
      */
     public $showPopover = true;
-
-    /**
-     * @var bool whether to display credits and link to hostip.info.
-     */
-    public $showCredits = true;
 
     /**
      * @var array the HTML attributes for the loading container. The following special tags are recognized:
@@ -80,6 +77,11 @@ class IpInfo extends Widget
     public $noDataOptions = ['class' => 'alert alert-danger text-center'];
 
     /**
+     * @var string the default or empty flag markup
+     */
+    public $defaultFlag = '<i class="glyphicon glyphicon-question-sign text-warning"></i>';
+
+    /**
      * @var array the markup to be displayed when any exception is faced during processing by the API (e.g. no
      *     connectivity). You can set this to a blank string to not display anything. Defaults to:
      *      `<i class="glyphicon glyphicon-exclamation-sign text-danger"></i>`.
@@ -89,7 +91,7 @@ class IpInfo extends Widget
     /**
      * @var array the HTML attributes for error data container. Defaults to: `['title' => 'IP fetch error']`. The
      *     following special tags are recognized:
-     *     - `tag`: string, the `tag` in which the content will be rendered. Defaults to `span`.
+     *     - `tag`: string, the `tag` in which the content will be rendered. Defaults to `div`.
      */
     public $errorDataOptions = ['class' => 'img-thumbnail btn-default', 'style' => 'padding:0 6px'];
 
@@ -107,9 +109,14 @@ class IpInfo extends Widget
     public $popoverOptions = [];
 
     /**
-     * @var array the HTML attributes for the flag image.
+     * @var array the HTML attributes for the flag wrapper container.
      */
-    public $flagOptions = ['style' => 'height:18px'];
+    public $flagWrapperOptions = [];
+
+    /**
+     * @var array the HTML attributes for the flag image (rendered via `flag-icon-css` in `kartik-v/yii2-icons`).
+     */
+    public $flagOptions = [];
 
     /**
      * @var array the header title for content shown in the popover. Defaults to `IP Position Details`
@@ -128,7 +135,7 @@ class IpInfo extends Widget
 
     /**
      * @var array the HTML attributes for the widget container. The following special tags are recognized:
-     * - `tag`: string, the `tag` in which the content will be rendered. Defaults to `span`.
+     * - `tag`: string, the `tag` in which the content will be rendered. Defaults to `div`.
      */
     public $options = [];
 
@@ -143,7 +150,7 @@ class IpInfo extends Widget
     public function run()
     {
         $this->initOptions();
-        echo $this->renderWidget();
+        $this->renderWidget();
     }
 
     /**
@@ -154,12 +161,17 @@ class IpInfo extends Widget
         $this->_msgCat = 'kvip';
         $this->initI18N();
         $this->_defaultFields = [
+            'ip' => Yii::t('kvip', 'IP Address'),
             'country_code' => Yii::t('kvip', 'Country Code'),
             'country_name' => Yii::t('kvip', 'Country Name'),
+            'region_code' => Yii::t('kvip', 'Region Code'),
+            'region_name' => Yii::t('kvip', 'Region Name'),
             'city' => Yii::t('kvip', 'City'),
-            'ip' => Yii::t('kvip', 'IP Address'),
-            'lat' => Yii::t('kvip', 'Latitude'),
-            'lng' => Yii::t('kvip', 'Longitude')
+            'zip_code' => Yii::t('kvip', 'Zip Code'),
+            'time_zone' => Yii::t('kvip', 'Time Zone'),
+            'latitude' => Yii::t('kvip', 'Latitude'),
+            'longitude' => Yii::t('kvip', 'Longitude'),
+            'metro_code' => Yii::t('kvip', 'Metro Code'),
         ];
         if (!isset($this->errorDataOptions['title'])) {
             $this->errorDataOptions['title'] = Yii::t('kvip', 'IP fetch error');
@@ -168,32 +180,28 @@ class IpInfo extends Widget
 
     /**
      * Renders the widget
-     *
-     * @return string
      */
     protected function renderWidget()
     {
-        $ip = $ipParam = '';
-        $params = [];
         if (!empty($this->ip)) {
-            $ip = Html::encode($this->ip);
-            $ipParam = "?ip={$ip}";
-            $params['ip'] = $ip;
+            $this->api .= $this->ip;
         }
-        if ($this->showPosition) {
-            $params['position'] = true;
+        if (empty($this->flagWrapperOptions['id'])) {
+            $this->flagWrapperOptions['id']  = $this->options['id'] . '-flag';
         }
         $loadData = ArrayHelper::remove($this->loadingOptions, 'message', Yii::t('kvip', 'Fetching location info...'));
         $content = self::renderTag(self::renderTag($loadData, $this->loadingOptions, 'div'), $this->options);
         if ($this->showFlag) {
-            if (!isset($this->flagOptions['alt'])) {
-                $this->flagOptions['alt'] = empty($ip) ? Yii::t('kvip', 'No Flag') : $ip;
+            Icon::map($this->getView(), Icon::FI);
+            if (empty($this->flagOptions['class'])) {
+                $this->flagOptions['class'] = 'flag-icon';
             }
-            $flag = Html::img(self::API_FLAG . $ipParam, $this->flagOptions);
+            $flag = Html::tag('div', $this->defaultFlag, $this->flagWrapperOptions);
             if ($this->showPopover) {
                 $header = isset($this->contentHeader) ? $this->contentHeader : Yii::t('kvip', 'IP Position Details');
                 $this->popoverOptions['header'] = $this->contentHeaderIcon . $header;
-                if (!isset($this->popoverOptions['toggleButton']) && !isset($this->popoverOptions['toggleButton']['class'])) {
+                $popOpts = $this->popoverOptions;
+                if (!isset($popOpts['toggleButton']) && !isset($popOpts['toggleButton']['class'])) {
                     $this->popoverOptions['toggleButton']['class'] = 'btn btn-xs btn-link';
                 }
                 if (!isset($this->popoverOptions['toggleButton']['style'])) {
@@ -206,16 +214,14 @@ class IpInfo extends Widget
                 $content = $flag . $content;
             }
         }
-        $this->registerAssets($params);
-        return $content;
+        $this->registerAssets();
+        echo $content;
     }
 
     /**
      * Register plugin assets. Uses `kvIpInfo` jQuery plugin created by Krajee to refresh the IP information.
-     *
-     * @param array $params
      */
-    protected function registerAssets($params = [])
+    protected function registerAssets()
     {
         if (empty($this->noData)) {
             $noData = empty($this->ip) ? Yii::t('kvip', "No data found for the user's IP address.") :
@@ -223,24 +229,18 @@ class IpInfo extends Widget
         } else {
             $noData = $this->noData;
         }
-        $credits = '';
-        if ($this->showCredits) {
-            $label = ArrayHelper::remove($this->creditsOptions, 'label', Yii::t('kvip', 'Revalidate IP info'));
-            $credits = Html::a($label, self::API_HOME, $this->creditsOptions);
-        }
         $this->pluginOptions = [
+            'flagWrapper' => $this->showFlag ? $this->flagWrapperOptions['id'] : false,
+            'flagOptions' => $this->flagOptions,
             'fields' => empty($this->fields) ? array_keys($this->_defaultFields) : $this->fields,
             'defaultFields' => $this->_defaultFields,
-            'url' => self::API_INFO,
-            'params' => $params,
-            'credits' => $credits,
+            'url' => $this->api,
             'contentOptions' => $this->contentOptions,
             'noData' => self::renderTag($noData, $this->noDataOptions, 'div'),
             'errorData' => empty($this->errorData) ? '' : self::renderTag($this->errorData, $this->errorDataOptions)
         ];
-        $view = $this->getView();
         $this->registerPlugin('kvIpInfo');
-        IpInfoAsset::register($view);
+        IpInfoAsset::register($this->getView());
     }
 
     /**
@@ -252,7 +252,7 @@ class IpInfo extends Widget
      *
      * @return string
      */
-    protected static function renderTag($content, &$options = [], $tag = 'span')
+    protected static function renderTag($content, &$options = [], $tag = 'div')
     {
         $tag = ArrayHelper::remove($options, 'tag', $tag);
         return Html::tag($tag, $content, $options);
