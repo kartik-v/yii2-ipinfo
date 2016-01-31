@@ -17,6 +17,13 @@
     font-size: 12px;
 }
 
+.kv-ipinfo-button {
+    background: none;
+    border: none;
+    padding: 0 2px;
+    margin: 0;
+}
+
 .kv-flag-center {
     display: block;
     margin: 5px auto;

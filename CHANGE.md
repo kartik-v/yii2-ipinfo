@@ -9,3 +9,4 @@ Change Log: `yii2-ipinfo`
 - (enh #3): Enhance extension to use AJAX based jQuery plugin to refresh IP info.
 - (enh #4): Revamp widget to use `freegeoip.net` API.
 - (enh #5): Use scalable flag icons from `kartik-v/yii2-icons`.
+- (enh #6): New `template` property for rendering position fields in popover toggle button.

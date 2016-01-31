@@ -37,6 +37,13 @@ class IpInfo extends Widget
     public $ip;
 
     /**
+     * @var string the template for rendering the initial button (applicable only when `showPopover` is true). The tags
+     *     in braces represent value of each IP position field (set in `fields` property) fetched from the
+     *     freegeoip.net API. Note that the `{flag}` tag will render the flag icon based on the `showFlag` setting.
+     */
+    public $template = '{flag} {country_code}';
+
+    /**
      * @var bool whether to show flag
      */
     public $showFlag = true;
@@ -77,9 +84,18 @@ class IpInfo extends Widget
     public $noDataOptions = ['class' => 'alert alert-danger text-center'];
 
     /**
-     * @var string the default or empty flag markup
+     * @var string the default initial values for the fields set in the `template` property before they are fetched
+     *     from the API. Defaults to:
+     * ```
+     * $defaultFieldValues = [
+     *      'flag' => '<i class="glyphicon glyphicon-question-sign text-warning"></i>',
+     *      'country_code' => 'N.A.'
+     *      'country_name' => 'Unknown'
+     *  ];
+     *
+     * ```
      */
-    public $defaultFlag = '<i class="glyphicon glyphicon-question-sign text-warning"></i>';
+    public $defaultFieldValues = [];
 
     /**
      * @var array the markup to be displayed when any exception is faced during processing by the API (e.g. no
@@ -187,32 +203,50 @@ class IpInfo extends Widget
             $this->api .= $this->ip;
         }
         if (empty($this->flagWrapperOptions['id'])) {
-            $this->flagWrapperOptions['id']  = $this->options['id'] . '-flag';
+            $this->flagWrapperOptions['id'] = $this->options['id'] . '-flag';
         }
         $loadData = ArrayHelper::remove($this->loadingOptions, 'message', Yii::t('kvip', 'Fetching location info...'));
         $content = self::renderTag(self::renderTag($loadData, $this->loadingOptions, 'div'), $this->options);
+        $this->defaultFieldValues += [
+            'flag' => '<i class="glyphicon glyphicon-question-sign text-warning"></i>',
+            'country_code' => Yii::t('kvip', 'N.A.'),
+            'country_name' => Yii::t('kvip', 'Unknown'),
+            'ip' => '',
+            'region_code' => '',
+            'region_name' => '',
+            'city' => '',
+            'zip_code' => '',
+            'time_zone' => '',
+            'latitude' => '',
+            'longitude' => '',
+            'metro_code' => ''
+        ];
+        $flag = '';
+        $label = $this->template;
         if ($this->showFlag) {
             Icon::map($this->getView(), Icon::FI);
             if (empty($this->flagOptions['class'])) {
                 $this->flagOptions['class'] = 'flag-icon';
             }
-            $flag = Html::tag('div', $this->defaultFlag, $this->flagWrapperOptions);
-            if ($this->showPopover) {
-                $header = isset($this->contentHeader) ? $this->contentHeader : Yii::t('kvip', 'IP Position Details');
-                $this->popoverOptions['header'] = $this->contentHeaderIcon . $header;
-                $popOpts = $this->popoverOptions;
-                if (!isset($popOpts['toggleButton']) && !isset($popOpts['toggleButton']['class'])) {
-                    $this->popoverOptions['toggleButton']['class'] = 'btn btn-xs btn-link';
-                }
-                if (!isset($this->popoverOptions['toggleButton']['style'])) {
-                    $this->popoverOptions['toggleButton']['style'] = 'margin:0';
-                }
-                $this->popoverOptions['toggleButton']['label'] = $flag;
-                $this->popoverOptions['content'] = $content;
-                $content = PopoverX::widget($this->popoverOptions);
-            } else {
-                $content = $flag . $content;
+            extract($this->defaultFieldValues);
+            $flag = Html::tag('span', $this->defaultFieldValues['flag'], $this->flagWrapperOptions);
+        }
+        foreach ($this->defaultFieldValues as $tag => $value) {
+            $field = Html::tag('span', $value, ['id' => $this->options['id'] . '-' . $tag]);
+            $label = str_replace('{' . $tag . '}', ($tag === 'flag' ? $flag : $field), $label);
+        }
+        if ($this->showPopover) {
+            $header = isset($this->contentHeader) ? $this->contentHeader : Yii::t('kvip', 'IP Position Details');
+            $this->popoverOptions['header'] = $this->contentHeaderIcon . $header;
+            $popOpts = $this->popoverOptions;
+            if (!isset($popOpts['toggleButton']) && !isset($popOpts['toggleButton']['class'])) {
+                $this->popoverOptions['toggleButton']['class'] = 'kv-ipinfo-button';
             }
+            $this->popoverOptions['toggleButton']['label'] = $label;
+            $this->popoverOptions['content'] = $content;
+            $content = PopoverX::widget($this->popoverOptions);
+        } else {
+            $content = $flag . $content;
         }
         $this->registerAssets();
         echo $content;

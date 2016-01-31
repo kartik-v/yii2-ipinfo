@@ -38,7 +38,7 @@
                 },
                 success: function (data, textStatus, jqXHR) {
                     //noinspection JSUnresolvedVariable
-                    var out = data, $table, $div, $flag, opts, css, content = '', country = out.country_code;
+                    var out = data, $table, $div, $flag, opts, css, content = '', country = out.country_code, $fld;
                     $el.trigger('success.kvipinfo', [data, textStatus, jqXHR]);
                     if (!out || !country) {
                         $el.html(self.noData);
@@ -46,18 +46,22 @@
                         if (self.flagWrapper) {
                             opts = $.isEmptyObject(self.flagOptions) ? {} : self.flagOptions;
                             css = 'flag-icon-' + country.toLowerCase();
-                            $flag = $(document.createElement('div')).attr(opts).removeClass(css).addClass(css);
+                            $flag = $(document.createElement('span')).attr(opts).removeClass(css).addClass(css);
                             $('#' + self.flagWrapper).html('').append($flag);
                         }
                         $.each(self.fields, function (key, value) {
                             if (out[value] !== undefined) {
                                 content += "<tr><th>" + self.defaultFields[value] + "</th>" +
                                     "<td>" + out[value] + "</td></tr>\n";
+                                $fld = $('#' + self.$element.attr('id') + '-' + value);
+                                if ($fld.length) {
+                                    $fld.html(out[value]);
+                                }
                             }
                         });
                         if (content) {
                             $table = $(document.createElement('table')).attr(self.contentOptions).append(content);
-                            $div = $(document.createElement('div')).append($table);
+                            $div = $(document.createElement('span')).append($table);
                             $el.html($div.html());
                             $div.remove();
                         } else {
