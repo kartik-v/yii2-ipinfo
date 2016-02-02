@@ -37,11 +37,28 @@ class IpInfo extends Widget
     public $ip;
 
     /**
-     * @var string the template for rendering the initial button (applicable only when `showPopover` is true). The tags
-     *     in braces represent value of each IP position field (set in `fields` property) fetched from the
-     *     freegeoip.net API. Note that the `{flag}` tag will render the flag icon based on the `showFlag` setting.
+     * @var array the template configuration for rendering the popover button, popover content, or inline content. This
+     *     should be set as `$key => $value` pairs, where `$key` is one of:
+     *     - `popoverButton`: this is the template for popover button label (applied when `showPopover` is `true`)
+     *     - `popoverContent`: this is the template for popover content displayed on click of the button (applied when
+     *     `showPopover` is `true`)
+     *     - `contentInline`: this is the template for inline content when `showPopover` is set to `false`
+     *     The `$value` is the template setting and can contain tags in braces, which will represent value of each IP
+     *     position field (set in `fields` property) fetched from the freegeoip.net API (for example `{country_code}`,
+     *     `{country_name}` etc.).  The following additional special tags will be replaced:
+     *     - '{flag}': Will be replaced with the flag icon rendered based on the `showFlag` setting.
+     *     - '{table}': Will render all fields configured via `fields` in a tabular format of labels and values.
      */
-    public $template = '{flag} {country_code}';
+    public $template = [];
+
+    /**
+     * @var string the template for rendering the content inline when `showPopover` is `false`. The tags in braces
+     *     represent value of each IP position field (set in `fields` property) fetched from the freegeoip.net API (for
+     *     example `{country_code}`, `{country_name}` etc.).  The following additional special tags will be replaced:
+     *     - '{flag}': will be replaced with the flag icon rendered based on the `showFlag` setting.
+     *     - '{table}':will render all fields configured via `fields` in a tabular format of labels and values.
+     */
+    public $templateContent = '{table}';
 
     /**
      * @var bool whether to show flag
@@ -67,10 +84,18 @@ class IpInfo extends Widget
     public $loadingOptions = ['class' => 'kv-ip-loading'];
 
     /**
-     * @var array the HTML attributes for the credits. The following special tags are recognized:
-     *      - `label`: string, the `label` for the credits link. Defaults to 'Revalidate IP info'.
+     * @var array the default initial values for the field tags used in the `template` property before they are
+     *     fetched from the API. Defaults to:
+     * ```
+     * $defaultFieldValues = [
+     *      'flag' => '<i class="glyphicon glyphicon-question-sign text-warning"></i>',
+     *      'country_code' => 'N.A.'
+     *      'country_name' => 'Unknown'
+     *  ];
+     *
+     * ```
      */
-    public $creditsOptions = ['class' => 'btn btn-xs center-block', 'target' => '_blank'];
+    public $defaultFieldValues = [];
 
     /**
      * @var array the message to be shown when no data is found. Defaults to: `No data found for IP address {ip}`.
@@ -82,20 +107,6 @@ class IpInfo extends Widget
      *      - `tag`: string, the `tag` in which the content will be rendered. Defaults to `div`.
      */
     public $noDataOptions = ['class' => 'alert alert-danger text-center'];
-
-    /**
-     * @var string the default initial values for the fields set in the `template` property before they are fetched
-     *     from the API. Defaults to:
-     * ```
-     * $defaultFieldValues = [
-     *      'flag' => '<i class="glyphicon glyphicon-question-sign text-warning"></i>',
-     *      'country_code' => 'N.A.'
-     *      'country_name' => 'Unknown'
-     *  ];
-     *
-     * ```
-     */
-    public $defaultFieldValues = [];
 
     /**
      * @var array the markup to be displayed when any exception is faced during processing by the API (e.g. no
@@ -189,9 +200,38 @@ class IpInfo extends Widget
             'longitude' => Yii::t('kvip', 'Longitude'),
             'metro_code' => Yii::t('kvip', 'Metro Code'),
         ];
+        $this->template += [
+            'popoverButton' => '{flag} {country_code}',
+            'popoverContent' => '{table}',
+            'inlineContent' => '{flag} {table}' // when showPopover is false
+        ];
         if (!isset($this->errorDataOptions['title'])) {
             $this->errorDataOptions['title'] = Yii::t('kvip', 'IP fetch error');
         }
+    }
+
+    /**
+     * Parses template tags for replace
+     *
+     * @param string $template
+     * @param string $flag
+     * @param string $tag
+     * @param string $value
+     * @param string $type
+     *
+     * @return string
+     */
+    protected function parseTag($template, $tag, $value, $flag, $type = 'p')
+    {
+        if ($tag === 'table') {
+            Html::addCssClass($this->contentOptions, $this->options['id'] . '-table-' . $type);
+            $field = Html::tag('table', '', $this->contentOptions);
+        } elseif ($tag === 'flag') {
+            $field = $flag;
+        } else {
+            $field = Html::tag('span', $value, ['id' => $this->options['id'] . '-' . $tag . '-' . $type]);
+        }
+        return str_replace('{' . $tag . '}', $field, $template);
     }
 
     /**
@@ -206,9 +246,9 @@ class IpInfo extends Widget
             $this->flagWrapperOptions['id'] = $this->options['id'] . '-flag';
         }
         $loadData = ArrayHelper::remove($this->loadingOptions, 'message', Yii::t('kvip', 'Fetching location info...'));
-        $content = self::renderTag(self::renderTag($loadData, $this->loadingOptions, 'div'), $this->options);
         $this->defaultFieldValues += [
             'flag' => '<i class="glyphicon glyphicon-question-sign text-warning"></i>',
+            'table' => '',
             'country_code' => Yii::t('kvip', 'N.A.'),
             'country_name' => Yii::t('kvip', 'Unknown'),
             'ip' => '',
@@ -221,20 +261,24 @@ class IpInfo extends Widget
             'longitude' => '',
             'metro_code' => ''
         ];
-        $flag = '';
-        $label = $this->template;
+        $popoverButton = $popoverContent = $inlineContent = $flag = '';
+        extract($this->template);
         if ($this->showFlag) {
             Icon::map($this->getView(), Icon::FI);
             if (empty($this->flagOptions['class'])) {
                 $this->flagOptions['class'] = 'flag-icon';
             }
-            extract($this->defaultFieldValues);
             $flag = Html::tag('span', $this->defaultFieldValues['flag'], $this->flagWrapperOptions);
         }
         foreach ($this->defaultFieldValues as $tag => $value) {
-            $field = Html::tag('span', $value, ['id' => $this->options['id'] . '-' . $tag]);
-            $label = str_replace('{' . $tag . '}', ($tag === 'flag' ? $flag : $field), $label);
+            if ($this->showPopover) {
+                $popoverButton = $this->parseTag($popoverButton, $tag, $value, $flag, 'p');
+                $popoverContent = $this->parseTag($popoverContent, $tag, $value, $flag, 'i');
+            } else {
+                $inlineContent = $this->parseTag($inlineContent, $tag, $value, $flag, 'i');
+            }
         }
+        $content = self::renderTag($loadData, $this->loadingOptions, 'div');
         if ($this->showPopover) {
             $header = isset($this->contentHeader) ? $this->contentHeader : Yii::t('kvip', 'IP Position Details');
             $this->popoverOptions['header'] = $this->contentHeaderIcon . $header;
@@ -242,11 +286,17 @@ class IpInfo extends Widget
             if (!isset($popOpts['toggleButton']) && !isset($popOpts['toggleButton']['class'])) {
                 $this->popoverOptions['toggleButton']['class'] = 'kv-ipinfo-button';
             }
-            $this->popoverOptions['toggleButton']['label'] = $label;
-            $this->popoverOptions['content'] = $content;
+            $this->popoverOptions['toggleButton']['label'] = $popoverButton;
+            $this->popoverOptions['content'] = self::renderTag(
+                $content . '<div class="kv-hide">' . $popoverContent . '</div>',
+                $this->options
+            );
             $content = PopoverX::widget($this->popoverOptions);
         } else {
-            $content = $flag . $content;
+            $content = self::renderTag(
+                $content . '<div class="kv-hide">' . $inlineContent . '</div>',
+                $this->options
+            );
         }
         $this->registerAssets();
         echo $content;
@@ -269,7 +319,6 @@ class IpInfo extends Widget
             'fields' => empty($this->fields) ? array_keys($this->_defaultFields) : $this->fields,
             'defaultFields' => $this->_defaultFields,
             'url' => $this->api,
-            'contentOptions' => $this->contentOptions,
             'noData' => self::renderTag($noData, $this->noDataOptions, 'div'),
             'errorData' => empty($this->errorData) ? '' : self::renderTag($this->errorData, $this->errorDataOptions)
         ];

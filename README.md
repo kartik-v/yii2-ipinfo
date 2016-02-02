@@ -14,6 +14,7 @@ An IP address information display widget for Yii framework 2.0 with ability to d
 - Ability to display the flag for a IP address.
 - Ability to display geo position details for the IP address.
 - Ability to render IP details inline instead of popover.
+- Ability to configure fields rendered and also control the layout with templates.
 - Use `yii2-popover-x` extension features to control popover placements and styles.
 - Use flag icons from `yii2-icons` to render country wise high resolution flags of any size.
 - Uses Yii i18N translations to generate locale specific data.

@@ -66,3 +66,7 @@
     border: 1px solid #ddd;
     border-radius: 5px;
 }
+
+.kv-hide {
+    display: none;
+}

@@ -38,7 +38,7 @@
                 },
                 success: function (data, textStatus, jqXHR) {
                     //noinspection JSUnresolvedVariable
-                    var out = data, $table, $div, $flag, opts, css, content = '', country = out.country_code, $fld;
+                    var out = data, $flag, opts, css, content = '', country = out.country_code;
                     $el.trigger('success.kvipinfo', [data, textStatus, jqXHR]);
                     if (!out || !country) {
                         $el.html(self.noData);
@@ -53,18 +53,16 @@
                             if (out[value] !== undefined) {
                                 content += "<tr><th>" + self.defaultFields[value] + "</th>" +
                                     "<td>" + out[value] + "</td></tr>\n";
-                                $fld = $('#' + self.$element.attr('id') + '-' + value);
-                                if ($fld.length) {
-                                    $fld.html(out[value]);
-                                }
+                                self.setContent('p', value, out[value]);
+                                self.setContent('i', value, out[value]);
                             }
                         });
                         if (content) {
-                            $table = $(document.createElement('table')).attr(self.contentOptions).append(content);
-                            $div = $(document.createElement('span')).append($table);
-                            $el.html($div.html());
-                            $div.remove();
-                        } else {
+                            self.setContent('p', 'table', content);
+                            self.setContent('i', 'table', content);
+                        }
+                        $el.html($el.find('.kv-hide').html());
+                        if (!$el.text().length) {
                             $el.html(self.noData);
                         }
                     }
@@ -73,6 +71,19 @@
                     $el.trigger('error.kvipinfo', [jqXHR, textStatus, errorThrown]).html(self.errorData);
                 }
             });
+        },
+        setContent: function(type, tag, content) {
+            var self = this, id = self.$element.attr('id'), sel = tag === 'table' ? 'table.' : '#',
+                $fld = $(sel + id + '-' + tag + '-' + type);
+            if (!$fld.length) {
+                return;
+            }
+            if (content.length) {
+                $fld.html(content);
+            } else {
+                $fld.remove();
+            }
+
         }
     };
 
@@ -99,7 +110,6 @@
         defaultFields: {},
         url: '',
         params: {},
-        contentOptions: {},
         noData: '',
         errorData: ''
     };
