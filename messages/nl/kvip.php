@@ -28,7 +28,7 @@ return [
     'Longitude' => 'Lengtegraad',
     'Metro Code' => 'Metro code',
     'No data found for IP address {ip}.' => 'Geen data gevonden voor IP-adres {ip}.',
-    'No data found for the user\'s IP address.' => 'Geen data gevonden voor de gebruiker\' s IP-adres.',
+    'No data found for the user\'s IP address.' => 'Geen data gevonden voor het IP-adres van de gebruiker.',
     'Region Code' => 'Regiocode',
     'Region Name' => 'Regionaam',
     'Time Zone' => 'Tijdzone',
