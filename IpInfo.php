@@ -29,7 +29,7 @@ class IpInfo extends Widget
     /**
      * @var string the api to fetch IP information
      */
-    public $api = 'http://freegeoip.net/json/';
+    public $api = 'https://freegeoip.net/json/';
 
     /**
      * @var string the ip address
