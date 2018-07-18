@@ -29,13 +29,18 @@ class IpInfo extends Widget
     /**
      * @var string the api to fetch IP information
      */
-    public $api = 'https://freegeoip.net/json/';
+    public $api = 'http://api.ipstack.com/';
 
     /**
      * @var string the ip address
      */
     public $ip;
 
+     /**
+     * @var string api access key
+     */
+    public $access_key;
+    
     /**
      * @var array the template configuration for rendering the popover button, popover content, or inline content. This
      *     should be set as `$key => $value` pairs, where `$key` is one of:
@@ -318,7 +323,7 @@ class IpInfo extends Widget
             'flagOptions' => $this->flagOptions,
             'fields' => empty($this->fields) ? array_keys($this->_defaultFields) : $this->fields,
             'defaultFields' => $this->_defaultFields,
-            'url' => $this->api,
+            'url' => $this->api.'?access_key='.$this->access_key,
             'noData' => self::renderTag($noData, $this->noDataOptions, 'div'),
             'errorData' => empty($this->errorData) ? '' : self::renderTag($this->errorData, $this->errorDataOptions)
         ];
