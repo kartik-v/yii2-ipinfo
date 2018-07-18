@@ -55,6 +55,7 @@ use kartik\ipinfo\IpInfo;
 
 echo IpInfo::widget([
     'ip' => '12.23.155.123',
+    'access_key'=>'ACCESS_KEY'
     /**
      * optionally setup more options
      * refer docs for all options
