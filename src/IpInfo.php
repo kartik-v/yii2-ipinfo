@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2016
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package   yii2-ipinfo
  * @version   1.0.0
  */
@@ -14,6 +14,7 @@ use yii\helpers\ArrayHelper;
 use kartik\base\Widget;
 use kartik\icons\Icon;
 use kartik\popover\PopoverX;
+use yii\base\InvalidConfigException;
 
 /**
  * IP Info widget for Yii2 with ability to display country flag and
@@ -37,7 +38,7 @@ class IpInfo extends Widget
     public $ip;
 
      /**
-     * @var string api access key
+     * @var string api access key. If not set this will default from `Yii::$app->params['ipInfoAccessKey']`.
      */
     public $access_key;
     
@@ -213,6 +214,18 @@ class IpInfo extends Widget
         if (!isset($this->errorDataOptions['title'])) {
             $this->errorDataOptions['title'] = Yii::t('kvip', 'IP fetch error');
         }
+        if (!isset($this->access_key)) {
+            if (!isset(Yii::$app->params['ipInfoAccessKey'])) {
+                throw new InvalidConfigException('The API Access Key must be set within `IpInfo::access_key` OR `Yii:$app->params["ipInfoAccessKey"]`.');
+            }
+            $this->access_key = Yii::$app->params['ipInfoAccessKey'];
+        }
+        if (!isset($this->ip)) {
+            $this->ip = Yii::$app->request->getUserIP();
+        }
+        if (isset($this->pjaxContainerId) && !isset($this->popoverOptions['pjaxContainerId'])) {
+            $this->popoverOptions['pjaxContainerId'] = $this->pjaxContainerId;
+        }
     }
 
     /**
@@ -244,9 +257,7 @@ class IpInfo extends Widget
      */
     protected function renderWidget()
     {
-        if (!empty($this->ip)) {
-            $this->api .= $this->ip;
-        }
+        $this->api .= $this->ip;
         if (empty($this->flagWrapperOptions['id'])) {
             $this->flagWrapperOptions['id'] = $this->options['id'] . '-flag';
         }
@@ -332,7 +343,7 @@ class IpInfo extends Widget
     }
 
     /**
-     * Renders a tag based on content and options, in which  the tag is set within options.
+     * Renders a tag based on content and options, in which the tag is set within options.
      *
      * @param string $content the content to render
      * @param array  $options the HTML attributes for the content container
