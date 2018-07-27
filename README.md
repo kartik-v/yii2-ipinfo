@@ -13,11 +13,14 @@ An IP address information display widget for Yii framework 2.0 with ability to d
 
 - Ability to display the flag for a IP address.
 - Ability to display geo position details for the IP address.
+- Ability to use your own API if needed
+- Implements a client parsing plugin and client level local storage caching for optimized performance.
 - Ability to render IP details inline instead of popover.
 - Ability to configure fields rendered and also control the layout with templates.
 - Use `yii2-popover-x` extension features to control popover placements and styles.
 - Use flag icons from `yii2-icons` to render country wise high resolution flags of any size.
 - Uses Yii i18N translations to generate locale specific data.
+
 
 > Note: Check the [composer.json](https://github.com/kartik-v/yii2-ipinfo/blob/master/composer.json) for this extension's requirements and dependencies. 
 Read this [web tip /wiki](http://webtips.krajee.com/setting-composer-minimum-stability-application/) on setting the `minimum-stability` settings for your application's composer.json.

@@ -1,6 +1,13 @@
 Change Log: `yii2-ipinfo`
 =========================
 
+## Version 1.0.1
+
+**Date**: 27-Jul-2018
+
+- (enh #14): Implement client level caching for optimal performance.
+- (enh #13): Implement ability to skip access key if NOT needed.
+
 ## Version 1.0.0
 
 **Date**: 18-Jul-2018

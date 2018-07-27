@@ -3,7 +3,7 @@
 /**
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package   yii2-ipinfo
- * @version   1.0.0
+ * @version   1.0.1
  */
 
 namespace kartik\ipinfo;
@@ -11,6 +11,7 @@ namespace kartik\ipinfo;
 use Yii;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use kartik\base\Widget;
 use kartik\icons\Icon;
 use kartik\popover\PopoverX;
@@ -41,6 +42,11 @@ class IpInfo extends Widget
      * @var string api access key. If not set this will default from `Yii::$app->params['ipInfoAccessKey']`.
      */
     public $access_key;
+    
+    /**
+     * @var bool whether access key is required. You can set this to `false` if using your own [[api]] endpoint.
+     */
+    public $needsAccessKey = true;
     
     /**
      * @var array the template configuration for rendering the popover button, popover content, or inline content. This
@@ -171,6 +177,18 @@ class IpInfo extends Widget
      * - `tag`: string, the `tag` in which the content will be rendered. Defaults to `div`.
      */
     public $options = [];
+    
+    /**
+     * @var bool whether to cache ip information in local client storage for the session. 
+     * This will optimize and reduce server api calls for ip addresses already parsed in 
+     * the past.
+     */
+    public $cache = true;
+
+    /**
+     * @var int the cache timeout in milli seconds when the client cache will expire.
+     */
+    public $cacheTimeout = 30000;
 
     /**
      * @var array the default field keys and labels setting (@see `initOptions` method)
@@ -214,7 +232,7 @@ class IpInfo extends Widget
         if (!isset($this->errorDataOptions['title'])) {
             $this->errorDataOptions['title'] = Yii::t('kvip', 'IP fetch error');
         }
-        if (!isset($this->access_key)) {
+        if ($this->needsAccessKey && !isset($this->access_key)) {
             if (!isset(Yii::$app->params['ipInfoAccessKey'])) {
                 throw new InvalidConfigException('The API Access Key must be set within `IpInfo::access_key` OR `Yii:$app->params["ipInfoAccessKey"]`.');
             }
@@ -329,14 +347,21 @@ class IpInfo extends Widget
         } else {
             $noData = $this->noData;
         }
+        $api = $this->api;
+        if ($this->needsAccessKey) {
+            $sep = strpos($api, '?') === false ? '?' : '&';
+            $api .= "{$sep}access_key={$this->access_key}";
+        }
         $this->pluginOptions = [
             'flagWrapper' => $this->showFlag ? $this->flagWrapperOptions['id'] : false,
             'flagOptions' => $this->flagOptions,
             'fields' => empty($this->fields) ? array_keys($this->_defaultFields) : $this->fields,
             'defaultFields' => $this->_defaultFields,
-            'url' => $this->api.'?access_key='.$this->access_key,
+            'url' => $api,
             'noData' => self::renderTag($noData, $this->noDataOptions, 'div'),
-            'errorData' => empty($this->errorData) ? '' : self::renderTag($this->errorData, $this->errorDataOptions)
+            'errorData' => empty($this->errorData) ? '' : self::renderTag($this->errorData, $this->errorDataOptions),
+            'cache' => $this->cache,
+            'cacheTimeout' => $this->cacheTimeout
         ];
         $this->registerPlugin('kvIpInfo');
         IpInfoAsset::register($this->getView());

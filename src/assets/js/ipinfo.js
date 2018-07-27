@@ -1,6 +1,6 @@
 /*!
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
- * @version 1.0.0
+ * @version 1.0.1
  *
  * Krajee IP Information fetcher plugin using PHP API from freegeoip.net. The plugin is built to work with
  * `kartik-v/yii2-ipinfo` extension. The plugin refreshes IP information via AJAX on document load.
@@ -19,12 +19,66 @@
         var self = this;
         self.$element = $(element);
         self.init(options);
+    }, KvIpInfoCache = {
+        exist: function (url, timeout) {
+            var cache = KvIpInfoCache.getStore();
+            return !!cache[url] && ((new Date().getTime() - cache[url].timestamp) < timeout);
+        },
+        get: function (url) {
+            var cache = KvIpInfoCache.getStore();
+            return cache[url] ? cache[url].data : {};
+        },
+        set: function (url, cachedData, callback) {
+            var cache = KvIpInfoCache.getStore();
+            cache[url] = cachedData;
+            delete cache[url];
+            KvIpInfoCache.setStore({timestamp: new Date().getTime(), data: cachedData});
+            if ($.isFunction(callback)) {
+                callback(cachedData);
+            }
+        },
+        getStore: function() {
+            var rawData = localStorage.getItem('KvIpInfoCache'); 
+            return rawData ? JSON.parse(rawData) : {};
+        },
+        setStore: function(data) {
+            localStorage.setItem('KvIpInfoCache', JSON.stringify(data));
+        }
     };
 
     KvIpInfo.prototype = {
         constructor: KvIpInfo,
         init: function (options) {
-            var self = this, $el = self.$element;
+            var self = this, $el = self.$element, getInfo = function(data) {
+                var out = data, $flag, opts, css, content = '', country = out.country_code;
+                $el.trigger('success.kvipinfo', [data]);
+                if (!out || !country) {
+                    $el.html(self.noData);
+                } else {
+                    if (self.flagWrapper) {
+                        opts = $.isEmptyObject(self.flagOptions) ? {} : self.flagOptions;
+                        css = 'flag-icon-' + country.toLowerCase();
+                        $flag = $(document.createElement('span')).attr(opts).removeClass(css).addClass(css);
+                        $('#' + self.flagWrapper).html('').append($flag);
+                    }
+                    $.each(self.fields, function (key, value) {
+                        if (out[value] !== undefined) {
+                            content += "<tr><th>" + self.defaultFields[value] + "</th>" +
+                                "<td>" + out[value] + "</td></tr>\n";
+                            self.setContent('p', value, out[value]);
+                            self.setContent('i', value, out[value]);
+                        }
+                    });
+                    if (content) {
+                        self.setContent('p', 'table', content);
+                        self.setContent('i', 'table', content);
+                    }
+                    $el.html($el.find('.kv-hide').html());
+                    if (!$el.text().length) {
+                        $el.html(self.noData);
+                    }
+                }
+            };
             $.each(options, function (key, value) {
                 self[key] = value;
             });
@@ -35,36 +89,18 @@
                 data: self.params,
                 beforeSend: function (jqXHR) {
                     $el.trigger('beforesend.kvipinfo', [jqXHR]);
+                    if (self.cache && KvIpInfoCache.exist(self.url, self.cacheTimeout)) {
+                        getInfo(KvIpInfoCache.get(self.url));
+                        return false;
+                    }
+                    return true;
                 },
                 success: function (data, textStatus, jqXHR) {
                     //noinspection JSUnresolvedVariable
-                    var out = data, $flag, opts, css, content = '', country = out.country_code;
-                    $el.trigger('success.kvipinfo', [data, textStatus, jqXHR]);
-                    if (!out || !country) {
-                        $el.html(self.noData);
+                    if (self.cache) {
+                        KvIpInfoCache.set(self.url, data, getInfo);
                     } else {
-                        if (self.flagWrapper) {
-                            opts = $.isEmptyObject(self.flagOptions) ? {} : self.flagOptions;
-                            css = 'flag-icon-' + country.toLowerCase();
-                            $flag = $(document.createElement('span')).attr(opts).removeClass(css).addClass(css);
-                            $('#' + self.flagWrapper).html('').append($flag);
-                        }
-                        $.each(self.fields, function (key, value) {
-                            if (out[value] !== undefined) {
-                                content += "<tr><th>" + self.defaultFields[value] + "</th>" +
-                                    "<td>" + out[value] + "</td></tr>\n";
-                                self.setContent('p', value, out[value]);
-                                self.setContent('i', value, out[value]);
-                            }
-                        });
-                        if (content) {
-                            self.setContent('p', 'table', content);
-                            self.setContent('i', 'table', content);
-                        }
-                        $el.html($el.find('.kv-hide').html());
-                        if (!$el.text().length) {
-                            $el.html(self.noData);
-                        }
+                        getInfo(data);
                     }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -111,8 +147,12 @@
         url: '',
         params: {},
         noData: '',
-        errorData: ''
+        errorData: '',
+        cache: true,
+        cacheTimeout: 0
     };
-
+    
+    $.fn.kvIpInfo.cache = {};
+    
     $.fn.kvIpInfo.Constructor = KvIpInfo;
 })(window.jQuery);
