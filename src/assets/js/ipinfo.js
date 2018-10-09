@@ -1,6 +1,6 @@
 /*!
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
- * @version 1.0.1
+ * @version 1.0.2
  *
  * Krajee IP Information fetcher plugin using PHP API from freegeoip.net. The plugin is built to work with
  * `kartik-v/yii2-ipinfo` extension. The plugin refreshes IP information via AJAX on document load.

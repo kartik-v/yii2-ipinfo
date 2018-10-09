@@ -1,7 +1,8 @@
 yii2-ipinfo
 ===========
 
-[![Latest Stable Version](https://poser.pugx.org/kartik-v/yii2-ipinfo/v/stable)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
+[![Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-ipinfo/v/stable)](https://packagist.org/packages/kartik-v/yii2-widget-ipinfo)
+[![Unstable Version](https://poser.pugx.org/kartik-v/yii2-widget-ipinfo/v/unstable)](https://packagist.org/packages/kartik-v/yii2-widget-ipinfo)
 [![License](https://poser.pugx.org/kartik-v/yii2-ipinfo/license)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
 [![Total Downloads](https://poser.pugx.org/kartik-v/yii2-ipinfo/downloads)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
 [![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-ipinfo/d/monthly)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
@@ -73,4 +74,4 @@ echo IpInfo::widget([
 
 ## License
 
-**yii2-ipinfo** is released under the BSD 3-Clause License. See the bundled `LICENSE.md` for details.
+**yii2-ipinfo** is released under the BSD-3-Clause License. See the bundled `LICENSE.md` for details.

@@ -1,6 +1,12 @@
 Change Log: `yii2-ipinfo`
 =========================
 
+## Version 1.0.2
+
+**Date**: 09-Oct-2018
+
+- Update composer dependencies
+
 ## Version 1.0.1
 
 **Date**: 27-Jul-2018
