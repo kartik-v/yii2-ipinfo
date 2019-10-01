@@ -1,6 +1,12 @@
 Change Log: `yii2-ipinfo`
 =========================
 
+## Version 2.0.1
+
+**Date**: 01-Oct-2019
+
+- Fix minified CSS file
+
 ## Version 2.0.0
 
 **Date**: 01-Oct-2019

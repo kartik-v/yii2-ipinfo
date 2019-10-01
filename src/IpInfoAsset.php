@@ -3,7 +3,7 @@
  * @package   yii2-ipinfo
  * @author    Kartik Visweswaran <kartikv2@gmail.com>
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2019
- * @version   2.0.0
+ * @version   2.0.1
  */
 
 namespace kartik\ipinfo;
