@@ -2,8 +2,8 @@
 /**
  * @package   yii2-ipinfo
  * @author    Kartik Visweswaran <kartikv2@gmail.com>
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
- * @version   1.0.2
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2019
+ * @version   2.0.0
  */
 
 namespace kartik\ipinfo;
@@ -26,7 +26,6 @@ class IpInfoAsset extends AssetBundle
     {
         $this->setSourcePath(__DIR__ . '/assets');
         $this->setupAssets('css', ['css/ipinfo']);
-        $this->setupAssets('js', ['js/ipinfo']);
         parent::init();
     }
 }

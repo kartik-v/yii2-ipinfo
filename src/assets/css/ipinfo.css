@@ -1,6 +1,6 @@
 /*!
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
- * @version 1.0.2
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2019
+ * @version 2.0.0
  *
  * CSS Styling for Krajee IP Information fetcher for `kartik-v/yii2-ipinfo` extension. 
  *
@@ -9,21 +9,40 @@
  * For more JQuery plugins visit http://plugins.krajee.com
  * For more Yii related demos visit http://demos.krajee.com
  */
+.kv-ipinfo-popover {
+    outline: none;
+}
+.kv-ipinfo-popover .popover-body {
+    padding: 0;
+}
+.kv-ipinfo-popover .table {
+    margin: 0;
+    font-size: 12px;
+}
+.kv-ipinfo-popover .ip-data-label {
+    min-width: 110px;
+}
 .kv-ip-loading {
     opacity: 0.8;
-    background: #ffffff url('../img/loading.gif') bottom 5px center no-repeat;
+    background: #fff url('../img/loading.gif') bottom 5px center no-repeat;
     padding: 5px 5px 20px 5px;
     text-align: center;
     font-size: 12px;
 }
-
 .kv-ipinfo-button {
     background: none;
     border: none;
     padding: 0 2px;
     margin: 0;
 }
-
+.kv-ipinfo-error {
+    margin: 6px 6px 6px 0;
+    padding: 6px 6px 6px 0;
+}
+.kv-ipinfo-popover .popover-body .kv-ipinfo-error {
+    margin-left: 6px;
+    padding-left: 6px;
+}
 .kv-flag-center {
     display: block;
     margin: 5px auto;
@@ -32,13 +51,13 @@
 
 .kv-flag-center .flag-icon {
     display: block;
-    margin:auto;
-    width:98%;
-    height:98%;
+    margin: auto;
+    width: 98%;
+    height: 98%;
 }
 
 .kv-flag-wrapper {
-    width:100%;
+    width: 100%;
     display: inline-block;
     position: relative;
     overflow: hidden;
@@ -51,7 +70,7 @@
     content: '';
 }
 
-.kv-flag-wrapper .flag {
+.kv-flag-wrapper .flag-icon {
     position: absolute;
     top: 0;
     bottom: 0;

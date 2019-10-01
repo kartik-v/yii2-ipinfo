@@ -2,7 +2,7 @@
     "name": "kartik-v/yii2-ipinfo",
     "description": "An IP address information display widget for Yii 2.0 with country flag and geo position info.",
     "keywords": ["yii2", "extension", "module", "ip", "ipinfo", "location", "geo", "position", "country", "flag"],
-    "homepage": "https://github.com/kartik-v/yii2-money",
+    "homepage": "https://github.com/kartik-v/yii2-ipinfo",
     "type": "yii2-extension",
     "license": "BSD-3-Clause",
     "authors": [
@@ -13,6 +13,7 @@
         }
     ],
     "require": {
+        "yiisoft/yii2-httpclient": "~2.0",
         "kartik-v/yii2-popover-x": "~1.3",
         "kartik-v/yii2-icons": "~1.4"
     },
@@ -23,7 +24,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "2.0.x-dev"
         }
     }
 }

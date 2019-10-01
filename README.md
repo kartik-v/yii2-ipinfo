@@ -11,21 +11,23 @@
     </a>
 </h1>
 
-[![Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-ipinfo/v/stable)](https://packagist.org/packages/kartik-v/yii2-widget-ipinfo)
-[![Unstable Version](https://poser.pugx.org/kartik-v/yii2-widget-ipinfo/v/unstable)](https://packagist.org/packages/kartik-v/yii2-widget-ipinfo)
+[![Stable Version](https://poser.pugx.org/kartik-v/yii2-ipinfo/v/stable)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
+[![Unstable Version](https://poser.pugx.org/kartik-v/yii2-ipinfo/v/unstable)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
 [![License](https://poser.pugx.org/kartik-v/yii2-ipinfo/license)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
 [![Total Downloads](https://poser.pugx.org/kartik-v/yii2-ipinfo/downloads)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
 [![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-ipinfo/d/monthly)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
 [![Daily Downloads](https://poser.pugx.org/kartik-v/yii2-ipinfo/d/daily)](https://packagist.org/packages/kartik-v/yii2-ipinfo)
 
-An IP address information display widget for Yii framework 2.0 with ability to display country flag and geo position info. This is based on the [HTTP API from ipstack.com (earlier freegeoip.net)](https://ipstack.com/) to parse IP address details. The plugin also uses the [yii2-popover-x](http://demos.krajee.com/popover-x) extension by Krajee for displaying details of the IP in a popover, and the <a href="http://demos.krajee.com/icons">yii2-icons</a> extension by Krajee for displaying the flag icons. 
+An IP address information display widget for Yii framework 2.0 with ability to display country flag and geo position info. This is based on the [HTTP API from ip-api.com](http://ip-api.com ) to parse IP address details. The plugin also uses the [yii2-popover-x](http://demos.krajee.com/popover-x) extension by Krajee and the [yii2-httpclient](https://github.com/yiisoft/yii2-httpclient) yiisoft extension for fetching and displaying IP details via a popover, and the [yii2-icons](http://demos.krajee.com/icons) extension by Krajee for displaying the flag icons. 
 
 ## Features  
 
 - Ability to display the flag for a IP address.
+- Implement **Yii2 HTTP Client** to process IP API info fetch. The 1.0 AJAX based API query will be eliminated and replaced with the Yii2 server based HTTP Client. This will ensure it works both for HTTPS and HTTP and also use yii2 caching.
+- Implement **Yii2 Cache** component to cache/store IP data. If Cache component is not defined no caching will be performed.
+- Implement **Yii2 DetailView** widget to render the IP Information Details table. The layout of attributes and formats can therefore be customized as per user need.
 - Ability to display geo position details for the IP address.
 - Ability to use your own API if needed
-- Implements a client parsing plugin and client level local storage caching for optimized performance.
 - Ability to render IP details inline instead of popover.
 - Ability to configure fields rendered and also control the layout with templates.
 - Use `yii2-popover-x` extension features to control popover placements and styles.
@@ -69,7 +71,6 @@ use kartik\ipinfo\IpInfo;
 
 echo IpInfo::widget([
     'ip' => '12.23.155.123',
-    'access_key'=>'ACCESS_KEY'
     /**
      * optionally setup more options
      * refer docs for all options
