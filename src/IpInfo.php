@@ -3,7 +3,7 @@
 /**
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2019
  * @package   yii2-ipinfo
- * @version   2.0.1
+ * @version   2.0.2
  */
 
 namespace kartik\ipinfo;
@@ -75,16 +75,16 @@ class IpInfo extends Widget
     public $requestConfig;
 
     /**
-     * @var bool whether to cache ip information in local client storage for the session. If set to `true`, the Yii2 
+     * @var bool whether to cache ip information in local client storage for the session. If set to `true`, the Yii2
      * application cache component will be used for caching. If Yii2 caching component is not set or disabled, the
-     * caching will be ignored silently without any exceptions. Using caching,  will optimize and reduce server api calls 
+     * caching will be ignored silently without any exceptions. Using caching,  will optimize and reduce server api calls
      * for ip addresses already parsed in the past.
      */
     public $cache = true;
 
     /**
      * @var bool whether to flush cache for this IP before fetching. This basically will clear the cached data every
-     * time if set to `true`. It is recommended to use and configure this property as a conditional check cleaning 
+     * time if set to `true`. It is recommended to use and configure this property as a conditional check cleaning
      * of the cache.
      */
     public $flushCache = false;
@@ -295,22 +295,21 @@ class IpInfo extends Widget
                 'method' => 'GET',
             ];
         }
-        if ($this->hideEmpty && !isset($this->detailViewConfig['template'])) {
+        if (!isset($this->detailViewConfig['template'])) {
             $this->detailViewConfig['template'] = function ($attribute) {
-                if (!empty($attribute['value'])) {
-                    $captionOptions = ArrayHelper::getValue($attribute, 'captionOptions', []);
-                    $contentOptions = ArrayHelper::getValue($attribute, 'contentOptions', []);
-                    Html::addCssClass($captionOptions, 'kv-data-label');
-                    Html::addCssClass($contentOptions, 'kv-data-value');
-                    return Html::tag(
-                        'tr',
-                        Html::tag('th', $attribute['label'], $captionOptions) .
-                        Html::tag('td', $attribute['value'], $contentOptions),
-                        $this->detailRowOptions
-                    );
-                } else {
+                if ($this->hideEmpty && empty($attribute['value'])) {
                     return '';
                 }
+                $captionOptions = ArrayHelper::getValue($attribute, 'captionOptions', []);
+                $contentOptions = ArrayHelper::getValue($attribute, 'contentOptions', []);
+                Html::addCssClass($captionOptions, 'kv-data-label');
+                Html::addCssClass($contentOptions, 'kv-data-value');
+                return Html::tag(
+                    'tr',
+                    Html::tag('th', $attribute['label'], $captionOptions) .
+                    Html::tag('td', $attribute['value'], $contentOptions),
+                    $this->detailRowOptions
+                );
             };
         }
         if (!isset($this->fields)) {
@@ -322,30 +321,68 @@ class IpInfo extends Widget
     }
 
     /**
+     * Get attribute visible setting for detail view
+     * @param string $attribute
+     * @return bool
+     */
+    protected function isVisible($attribute) {
+        return in_array($attribute, $this->fields) && !in_array($attribute, $this->skipFields);
+    }
+
+    /**
+     * Get attribute configuration for detail view
+     * @param string $attribute
+     * @return array
+     */
+    protected function getAttributeConfig($attribute)
+    {
+        return ['attribute' => $attribute, 'visible' => $this->isVisible($attribute)];
+    }
+
+    /**
      * Get default attributes configuration for the detail view
      * @param IpInfoModel $model
      * @return array
      */
     public function getDetailViewAttributes($model)
     {
+        $showContinentCode = $this->isVisible('continentCode');
+        $showContinent = $this->isVisible('continent');
+        $showCountryCode = $this->isVisible('countryCode');
+        $showCountry = $this->isVisible('country');
+        $showRegion = $this->isVisible('region');
+        $showRegionName = $this->isVisible('regionName');
         return [
-            'ip',
-            ['attribute' => 'continent', 'value' =>  empty($model->continent) && empty($model->continentCode) ? '' :
-                $model->continentCode . ' - ' . $model->continent],
-            ['attribute' => 'countryDetail', 'format' => 'raw'],
-            ['attribute' => 'regionName', 'value' => $model->region . ' - ' . $model->regionName],
-            'city',
-            'district',
-            'zip',
-            'latitude',
-            'longitude',
-            'timezone',
-            'currency',
-            'isp',
-            'org',
-            'as',
-            'mobile',
-            'proxy',
+            $this->getAttributeConfig('ip'),
+            [
+                'attribute' => 'continent',
+                'value' => $showContinent && $showContinentCode ? $model->getContinentDetail() : ($showContinent ? $model->continent: $model->continentCode),
+                'visible' => $showContinent || $showContinentCode
+            ],
+            [
+                'attribute' => 'country',
+                'format' => 'raw',
+                'value' => $showCountry && $showCountryCode ? $model->getCountryDetail() : ($showCountry ? $model->country: $model->countryCode),
+                'visible' => $showCountry || $showCountryCode
+            ],
+            [
+                'attribute' => 'region',
+                'format' => 'raw',
+                'value' => $showRegion && $showRegionName ? $model->getRegionDetail() : ($showRegion ? $model->region: $model->regionName),
+                'visible' => $showRegion || $showRegionName
+            ],
+            $this->getAttributeConfig('city'),
+            $this->getAttributeConfig('district'),
+            $this->getAttributeConfig('zip'),
+            ['attribute' => 'latitude', 'visible' => $this->isVisible('lat')],
+            ['attribute' => 'longitude', 'visible' => $this->isVisible('lon')],
+            $this->getAttributeConfig('timezone'),
+            $this->getAttributeConfig('currency'),
+            $this->getAttributeConfig('isp'),
+            $this->getAttributeConfig('org'),
+            $this->getAttributeConfig('as'),
+            $this->getAttributeConfig('mobile'),
+            $this->getAttributeConfig('proxy'),
         ];
     }
 

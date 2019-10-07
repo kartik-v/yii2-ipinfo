@@ -3,7 +3,7 @@
 /**
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2019
  * @package   yii2-ipinfo
- * @version   2.0.1
+ * @version   2.0.2
  */
 
 namespace kartik\ipinfo;
@@ -52,6 +52,26 @@ class IpInfoModel extends Model
             [['district', 'zip', 'lat', 'lon', 'timezone', 'currency', 'isp', 'org', 'as', 'asname'], 'safe'],
             [['reverse', 'mobile', 'proxy'], 'safe'],
         ];
+    }
+
+    /**
+     * Gets continent detail
+     * @return string
+     */
+    public function getContinentDetail()
+    {
+        return empty($this->continentCode) ? $this->continent :
+            ($this->continentCode . (empty($this->continent) ? '' :  ' - ' . $this->continent));
+    }
+
+    /**
+     * Gets region detail
+     * @return string
+     */
+    public function getRegionDetail()
+    {
+        return empty($this->region) ? $this->regionName :
+            ($this->region . (empty($this->regionName) ? '' :  ' - ' . $this->regionName));
     }
 
     /**
@@ -125,14 +145,16 @@ class IpInfoModel extends Model
     {
         return [
             'ip' => Yii::t('kvip', 'IP Address'),
+            'flag' => Yii::t('kvip', 'Flag'),
             'continentCode' => Yii::t('kvip', 'Continent Code'),
             'continent' => Yii::t('kvip', 'Continent'),
+            'continentDetail' => Yii::t('kvip', 'Continent'),
             'countryCode' => Yii::t('kvip', 'Country Code'),
             'country' => Yii::t('kvip', 'Country'),
-            'flag' => Yii::t('kvip', 'Flag'),
             'countryDetail' => Yii::t('kvip', 'Country'),
             'region' => Yii::t('kvip', 'Region Code'),
             'regionName' => Yii::t('kvip', 'Region'),
+            'regionDetail' => Yii::t('kvip', 'Region'),
             'city' => Yii::t('kvip', 'City'),
             'district' => Yii::t('kvip', 'District'),
             'zip' => Yii::t('kvip', 'Zip'),

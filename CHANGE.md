@@ -1,6 +1,13 @@
 Change Log: `yii2-ipinfo`
 =========================
 
+## Version 2.0.2
+
+**Date**: 07-Oct-2019
+
+- (enh #18): Intelligent default display of detail view attributes.
+- (enh #17): Update Brazilian Translations.
+
 ## Version 2.0.1
 
 **Date**: 01-Oct-2019
