@@ -3,7 +3,7 @@
 /**
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2019
  * @package   yii2-ipinfo
- * @version   2.0.2
+ * @version   2.0.1
  */
 
 namespace kartik\ipinfo;
@@ -48,7 +48,7 @@ class IpInfo extends Widget
     public $modelClass = "\\kartik\\ipinfo\\IpInfoModel";
 
     /**
-     * @var string the model class used for rendering the ip information
+     * @var string the Detail View widget class used for rendering the ip details information in a tabular form.
      */
     public $detailViewClass = "\\yii\\widgets\\DetailView";
 
@@ -75,7 +75,7 @@ class IpInfo extends Widget
     public $requestConfig;
 
     /**
-     * @var bool whether to cache ip information in local client storage for the session. If set to `true`, the Yii2
+     * @var bool whether to cache ip information in the server cache for the session. If set to `true`, the Yii2
      * application cache component will be used for caching. If Yii2 caching component is not set or disabled, the
      * caching will be ignored silently without any exceptions. Using caching,  will optimize and reduce server api calls
      * for ip addresses already parsed in the past.
@@ -110,15 +110,15 @@ class IpInfo extends Widget
     public $showFlag = true;
 
     /**
-     * @var bool whether to hide / skip display of fields with empty values
-     */
-    public $hideEmpty = true;
-
-    /**
      * @var bool whether to show details in a popover on click of flag.
      * If set to false, the results will be rendered inline.
      */
     public $showPopover = true;
+
+    /**
+     * @var bool whether to hide / skip display of fields with empty values
+     */
+    public $hideEmpty = true;
 
     /**
      * @var array the markup to be displayed when any exception is faced during processing by the API (e.g. no
@@ -151,20 +151,21 @@ class IpInfo extends Widget
     public $noData;
 
     /**
-     * @var array the list of field names to be shown in display. If this is not set all attributes from [[modelClass]]
-     * will be shown (the [[hideEmpty]] setting will control whether to hide attributes that have an empty value)
+     * @var array the list of names of fields/attributes to be shown in display. If this is not set all attributes from
+     * [[modelClass]] will be shown (the [[hideEmpty]] setting will control whether to hide attributes that have an
+     * empty value)
      */
     public $fields;
 
     /**
-     * @var array the list of column fields to be skipped from display. Note that this setting will override the
-     * [[fields]] setting.
+     * @var array the list of names of fields/ attributes which will be skipped from display. Note that this setting
+     * will override the [[fields]] setting.
      */
     public $skipFields = [];
 
     /**
      * @var array the widget configuration settings for `kartik\popover\PopoverX` widget that will show the details on
-     *     hover.
+     * button click / hover when [[showPopover]] is set to `true`.
      */
     public $popoverOptions = [];
 
@@ -179,7 +180,7 @@ class IpInfo extends Widget
     public $flagOptions = [];
 
     /**
-     * @var array the header title for content shown in the popover. Defaults to `IP Position Details`
+     * @var string the header title for content shown in the popover. Defaults to `IP Position Details`
      */
     public $contentHeader;
 
@@ -366,7 +367,7 @@ class IpInfo extends Widget
                 'visible' => $showCountry || $showCountryCode
             ],
             [
-                'attribute' => 'region',
+                'attribute' => 'regionName',
                 'format' => 'raw',
                 'value' => $showRegion && $showRegionName ? $model->getRegionDetail() : ($showRegion ? $model->region: $model->regionName),
                 'visible' => $showRegion || $showRegionName
@@ -496,6 +497,9 @@ class IpInfo extends Widget
             $pairs['{' . $key . '}'] = $value;
         }
         $pairs['{table}'] = strtr($outData, $pairs);
+        if (!$this->showFlag) {
+            $pairs['{flag}'] = '';
+        }
         if ($this->showPopover) {
             $popoverButton = strtr($this->template['popoverButton'], $pairs);
             $popoverContent = strtr($this->template['popoverContent'], $pairs);
