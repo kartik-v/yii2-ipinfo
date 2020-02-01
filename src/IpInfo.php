@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2019
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2020
  * @package   yii2-ipinfo
- * @version   2.0.1
+ * @version   2.0.3
  */
 
 namespace kartik\ipinfo;
@@ -408,7 +408,7 @@ class IpInfo extends Widget
      * @throws InvalidConfigException
      * @throws Exception
      */
-    protected function fetchIPDetails()
+    public function fetchIPDetails()
     {
         $key = "kvIp_{$this->ip}";
         $cache = ($this->cache && !empty(Yii::$app->cache)) ? Yii::$app->cache : false;
@@ -447,7 +447,7 @@ class IpInfo extends Widget
     /**
      * Renders the widget
      */
-    protected function renderWidget()
+    public function renderWidget()
     {
         if (empty($this->flagWrapperOptions['id'])) {
             $this->flagWrapperOptions['id'] = $this->options['id'] . '-flag';

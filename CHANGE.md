@@ -1,6 +1,12 @@
 Change Log: `yii2-ipinfo`
 =========================
 
+## Version 2.0.3
+
+**Date**: 01-Feb-2020
+
+- (enh #19): Make fetchIpDetails and renderWidget methods public.
+
 ## Version 2.0.2
 
 **Date**: 07-Oct-2019
